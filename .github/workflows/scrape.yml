@@ -1,0 +1,35 @@
+name: Auto Scrape and Update Stats
+
+on:
+  schedule:
+    # 毎週月曜日の朝4時（日本時間）に自動実行する例
+    - cron: '0 19 * * 0' 
+  workflow_dispatch: # 手動でもボタン一つで実行できるようにする
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install beautifulsoup4 pandas playwright
+          playwright install
+
+      - name: Run scraping script
+        run: python scrape_stats.py
+
+      - name: Commit and push if there are changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add playing_time_ranking_*.csv raw_playing_time_*.csv
+          git diff --quiet && git diff --cached --quiet || (git commit -m "Auto-update stats CSV [skip ci]" && git push)
