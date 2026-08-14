@@ -27,7 +27,7 @@ TARGET_LEAGUES = {
 }
 
 MATCH_ROW_SELECTOR = "div.columns.is-multiline.is-gapless.is-mobile:has(.match-result)"
-HEADLESS = False
+HEADLESS = True
 
 
 # ============================================================
